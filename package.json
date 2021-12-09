@@ -4,10 +4,8 @@
   "description": "La empresa de cultivos Servicios Agricolas Duque Lasso SAS desea automatizar a través de un sistema de información la siembra y recolección de cultivos. La compañía puede tener hasta X diferentes tipos de cultivos y cada uno de ellos debe ser parametrizable",
   "main": "index.js",
   "scripts": {
-    "babel-node": "babel-node",
-    "dev": "nodemon --exec npm run babel-node -- src/index.js",
-    "build": "babel src --out-dir dist",
-    "start": "npm run build && nodemon dist/index.js --exec babel-node"
+    "build": "babel index.js --out-file index.js",
+    "start": "npm run build && nodemon index.js"
   },
   "repository": {
     "type": "git",
