@@ -9,7 +9,7 @@ function _interopRequireDefault(obj) {
 }
 
 const app = (0, _express.default)();
-app.set("port", 3000);
+app.set("port", 5000);
 app.listen(app.get("port"), () => {
   console.log("Server on port", app.get("port"));
 });
