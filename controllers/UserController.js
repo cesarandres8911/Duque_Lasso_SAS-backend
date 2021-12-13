@@ -76,7 +76,13 @@ router.get('/all', authGuard, async (request, response) => {
 
         try {
             console.log("Obteniendo todos los usuarios...");
-            const usuarios = await Usuario.find({});
+            const usuarios = await Usuario.find({}, null, {
+                skip: ((page - 1) * limit),
+                limit: limit
+            })
+                .exec();
+                // total de usuarios
+            const total = await Usuario.countDocuments();
             const datos = usuarios.map(u => {
                 return {
                     _id: u._id,
@@ -87,7 +93,8 @@ router.get('/all', authGuard, async (request, response) => {
                     rol: u.rol,
                 }
             });
-            response.json(datos);
+            response.json({totalElements: total, usuarios: datos });
+            // response.json(datos);
         } catch (e) {
             console.log("Error al obtener todos los usuarios.");
             console.log(e);

@@ -18,7 +18,8 @@ const {
 const app = express();
 const port = process.env.PORT || 9000; // Configuramos el middleware de express
 
-app.use(cors());
+app.use(cors()); // Configuramos el middleware de cors para permitir peticiones desde cualquier origen
+
 app.use(express.json()); // Permite que los datos sean enviados en formato json
 
 app.use(express.urlencoded()); // Permite que los datos sean enviados en formato urlencoded

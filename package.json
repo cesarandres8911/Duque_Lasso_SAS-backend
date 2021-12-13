@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/cesarandres8911/Duque_Lasso_SAS-backend#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1"
   },
   "devDependencies": {
@@ -29,12 +30,12 @@
     "@babel/core": "^7.16.0",
     "@babel/node": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
-    "nodemon": "^2.0.15",
     "bcrypt": "^5.0.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.1.1",
+    "nodemon": "^2.0.15",
     "validator": "^13.7.0"
   }
 }
