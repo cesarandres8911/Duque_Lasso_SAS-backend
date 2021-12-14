@@ -35,13 +35,13 @@ const PredioSchema = new Schema({
     }],
 
 },
-
-    {
-        collection: 'Predios'
-    },
     {
         timestamps: true
+    },
+    {
+        collection: 'Predios'
     }
+
 );
 
 exports.Predio = model('Predios', PredioSchema);

@@ -5,7 +5,7 @@ const { authGuard } = require('../middlewares/auth');
 
 const router = express.Router();
 
-router.post('/new', async (request, response) => {
+router.post('/new', authGuard, async (request, response) => {
     try {
         console.log("Creando usuario nuevo...");
         const usr = new Usuario(request.body);
