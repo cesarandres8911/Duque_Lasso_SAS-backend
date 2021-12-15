@@ -19,6 +19,10 @@ const CultivoSchema = new Schema({
         type: Number,
         required: true
     },
+    area_destinada: {
+        type: Number,
+        required: true
+    },
     cantidad_semillas_hectarea: {
         type: Number,
         required: true
