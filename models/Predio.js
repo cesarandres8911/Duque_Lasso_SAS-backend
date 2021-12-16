@@ -9,34 +9,31 @@ const PredioSchema = new Schema({
         type: String,
         required: true
     },
+    imagen: {
+        type: String,
+        required: true,
+        default: 'https://lh3.googleusercontent.com/pw/AM-JKLUhM-b5l3b0_y1fLl6SCel-vfZ2Sd1o4XwvkkMxTIvMModGVvOUV175JkZJzWGbxrpj_1BwGUt8AKvw6DRbg21cBUEeP9Ty2T3RaD15AqHVRv3xT5uWZFSNYGluanDg45fJdarKNuCMNH9-E_d7Bv4=w516-h405-no?authuser=0'
+    },
     area: {
         type: Number,
         required: true
     },
-    lactitud: {
-        type: Number,
+    latitud: {
+        type: String,
         required: true
     },
     longitud: {
-        type: Number,
+        type: String,
         required: true
     },
     valor_agua: {
         type: Number,
-        required: true
+        default: 0
     },
     valor_kilogramo_fertilizante: {
         type: Number,
-        required: true
+        default: 0
     },
-    cultivos: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Cultivos'
-    }],
-    usuario: {
-        type: Schema.Types.ObjectId,
-        ref: 'Usuarios'
-    }
 
 },
     {

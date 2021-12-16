@@ -19,10 +19,19 @@ router.post('/new', authGuard, async (request, response) => {
 
 // Obtener todos los predios
 router.get('/all', authGuard, async (request, response) => {
+    const page = parseInt(request.query.page);
+    const limit = parseInt(request.query.limit);
+
     try {
         console.log("Obteniendo todos los predios...");
-        const predios = await Predio.find();
-        response.json(predios);
+        const predios = await Predio.find({}, null, {
+            skip: ((page - 1) * limit),
+            limit: limit
+        });
+
+        const total = await Predio.countDocuments();
+        response.json({ totalElements: total, predios: predios });
+        
     } catch (e) {
         console.log("Error obteniendo todos los predios: ");
         console.log(e);
@@ -34,8 +43,8 @@ router.get('/all', authGuard, async (request, response) => {
 router.get('/:id', authGuard, async (request, response) => {
     try {
         console.log("Obteniendo predio por id...");
-        const predio = await Predio.findById(request.params.id);
-        response.json(predio);
+        const predio = await Predio.findById(request.query.id);
+        response.json({predios: predio});
     } catch (e) {
         console.log("Error obteniendo predio por id: ");
         console.log(e);

@@ -41,25 +41,6 @@ router.get('/all', authGuard, async (request, response) => {
         });
 
         const total = await Cultivo.countDocuments();
-        // const datos = cultivos.map(cultivo => {
-        //     return {
-        //         id: cultivo.id,
-        //         nombre: cultivo.nombre,
-        //         descripcion: cultivo.descripcion,
-        //         imagen: cultivo.imagen,
-        //         precio: cultivo.precio,
-        //         cantidad_semillas_hectarea: cultivo.cantidad_semillas_hectarea,
-        //         cantidad_agua_semana: cultivo.cantidad_agua_semana,
-        //         cantidad_fertilizante_semana: cultivo.cantidad_fertilizante_semana,
-        //         tiempo_recoleccion_hectarea: cultivo.tiempo_recoleccion_hectarea,
-        //         tiempo_cosecha_semana: cultivo.tiempo_cosecha_semana,
-        //         kilogramos_hectareas: cultivo.kilogramos_hectareas,
-        //         tiempos_espera: cultivo.tiempos_espera,
-
-        //     }
-        // });
-
-
         response.json({ totalElements: total, cultivos: cultivos });
     } catch (e) {
         console.log("Error obteniendo todos los cultivos: ");
