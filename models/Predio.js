@@ -33,6 +33,10 @@ const PredioSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Cultivos'
     }],
+    usuario: {
+        type: Schema.Types.ObjectId,
+        ref: 'Usuarios'
+    }
 
 },
     {

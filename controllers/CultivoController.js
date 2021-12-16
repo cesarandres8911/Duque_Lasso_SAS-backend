@@ -2,16 +2,19 @@ const express = require('express');
 const { authGuard } = require('../middlewares/auth');
 const router = express.Router();
 const { Cultivo } = require('../models/Cultivo');
+const { Parametro } = require('../models/Parametro');
 
 // Crear cultivo nuevo
 router.post('/new', authGuard, async (request, response) => {
     try {
         console.log("Creando cultivo nuevo...");
         const cultivo = new Cultivo(request.body);
-        
+        const parametro = await Parametro.find();
         // Calculamos el precio del cultivo
 
-        cultivo.precio=40043343453450;
+        cultivo.precio = parametro[0].valor_agua * cultivo.cantidad_agua +
+            parametro[0].valor_fertilizante * cultivo.cantidad_fertilizante +
+            parametro[0].valor_semilla * cultivo.cantidad_semilla;
 
         // Se guarda el cultivo
         await cultivo.save();
@@ -52,7 +55,7 @@ router.get('/all', authGuard, async (request, response) => {
         //         tiempo_cosecha_semana: cultivo.tiempo_cosecha_semana,
         //         kilogramos_hectareas: cultivo.kilogramos_hectareas,
         //         tiempos_espera: cultivo.tiempos_espera,
-                
+
         //     }
         // });
 
@@ -71,7 +74,16 @@ router.get('/:id', authGuard, async (request, response) => {
     try {
         console.log("Obteniendo cultivo por id...");
         const cultivo = await Cultivo.findById(request.query.id);
-        response.json({cultivos:cultivo});
+
+        const parametro = await Parametro.find();
+        // Calculamos el precio del cultivo
+
+        cultivo.precio = parametro[0].valor_agua * cultivo.cantidad_agua_semana +
+            parametro[0].valor_fertilizante * cultivo.cantidad_fertilizante_semana +
+            parametro[0].valor_semilla * cultivo.cantidad_semillas_hectarea;
+
+
+        response.json({ cultivos: cultivo });
     } catch (e) {
         console.log("Error obteniendo cultivo por id: ");
         console.log(e);
@@ -84,8 +96,16 @@ router.put('/edit/:id', authGuard, async (request, response) => {
     try {
         console.log("Editando cultivo...");
         const { id } = request.params;
-        console.log(id);
-        const cultivo = await Cultivo.findByIdAndUpdate(id, request.body);
+        const datos = request.body;
+        console.log(datos);
+        const parametro = await Parametro.find();
+        // Calculamos el precio del cultivo
+
+        datos.precio = parametro[0].valor_agua * datos.cantidad_agua_semana +
+            parametro[0].valor_fertilizante * datos.cantidad_fertilizante_semana +
+            parametro[0].valor_semilla * datos.cantidad_semillas_hectarea;
+
+        const cultivo = await Cultivo.findByIdAndUpdate(id, datos);
         response.json({ message: 'Cultivo editado con exito.', id: cultivo.id });
     } catch (e) {
         console.log("Error editando cultivo: ");
