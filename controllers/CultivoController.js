@@ -49,8 +49,23 @@ router.get('/all', authGuard, async (request, response) => {
     }
 });
 
-// Obtener cultivo por id
+// Obtener todos los cultivos para auto-completar
+router.get('/all/autocomplete', authGuard, async (request, response) => {
+    try {
+        console.log("Obteniendo todos los cultivos para auto-completar...");
+        const cultivos = await Cultivo.find({}, null, {
+            skip: 0,
+            limit: 100
+        });
+        response.json({ cultivos: cultivos });
+    } catch (e) {
+        console.log("Error obteniendo todos los cultivos para auto-completar: ");
+        console.log(e);
+        response.status(500).send({ message: "Error al obtener todos los cultivos para auto-completar." });
+    }
+});
 
+// Obtener cultivo por id
 router.get('/:id', authGuard, async (request, response) => {
     try {
         console.log("Obteniendo cultivo por id...");

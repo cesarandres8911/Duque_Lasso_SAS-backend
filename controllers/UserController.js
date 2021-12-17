@@ -103,6 +103,36 @@ router.get('/all', authGuard, async (request, response) => {
     }
 });
 
+// Obtener todos los usuario por rol igual a userGestion para autocompletar
+router.get('/all/gestion/autocomplete', authGuard, async (request, response) => {
+
+    try {
+        console.log("Obteniendo todos los usuarios...");
+        const usuarios = await Usuario.find({ rol: "userGestion" }, null, {
+            
+                skip: 0,
+                limit: 100
+            })
+            .exec();
+        const datos = usuarios.map(u => {
+            return {
+                _id: u._id,
+                email: u.email,
+                nombre: u.nombre,
+                apellido: u.apellido,
+                telefono: u.telefono,
+                rol: u.rol,
+            }
+        });
+        
+        response.json({usuarios:datos});
+    } catch (e) {
+        console.log("Error al obtener todos los usuarios.");
+        console.log(e);
+        response.status(500).send({ message: "Error al obtener los usuarios." });
+    }
+});
+
 // Editar usuario
 router.put('/edit/:id', authGuard, async (request, response) => {
     try {

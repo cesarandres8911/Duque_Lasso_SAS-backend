@@ -1,13 +1,13 @@
 const { Schema, model } = require('mongoose');
 
-const AsignadosSchema = new Schema({
-    cultivos: [{
+const AsignarPredioSchema = new Schema({
+    predio: [{
         type: Schema.Types.ObjectId,
-        ref: 'Cultivos'
+        ref: 'Predio'
     }],
     usuario: {
         type: Schema.Types.ObjectId,
-        ref: 'Usuarios'
+        ref: 'Usuario'
 
     }
 },
@@ -15,9 +15,9 @@ const AsignadosSchema = new Schema({
         timestamps: true
     },
     {
-        collection: 'Predios'
+        collection: 'AsignarPredios'
     }
 
 );
 
-exports.Asignados = model('Asignados', AsignadosSchema);
+exports.AsignarPredio = model('AsignarPredio', AsignarPredioSchema);
