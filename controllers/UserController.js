@@ -133,6 +133,21 @@ router.get('/all/gestion/autocomplete', authGuard, async (request, response) => 
     }
 });
 
+// Obtener usuaio por id
+router.get('/:id', authGuard, async (request, response) => {
+    try {
+        console.log("Obteniendo predio por id...");
+        const { id } = request.params;
+        console.log(id);
+        const usuario = await Usuario.findById(id);
+        response.json({usuarios: usuario});
+    } catch (e) {
+        console.log("Error obteniendo el usuario por id: ");
+        console.log(e);
+        response.status(500).send({ message: "Error al obtener el usuario" });
+    }
+});
+
 // Editar usuario
 router.put('/edit/:id', authGuard, async (request, response) => {
     try {

@@ -50,6 +50,10 @@ const CultivoSchema = new Schema({
     tiempos_espera: {
         type: Number,
         required: true
+    },
+    predio: {
+        type: Schema.Types.ObjectId,
+        ref: 'Predio'
     }
 
 },

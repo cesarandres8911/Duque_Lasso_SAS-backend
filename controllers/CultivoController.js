@@ -11,10 +11,12 @@ router.post('/new', authGuard, async (request, response) => {
         const cultivo = new Cultivo(request.body);
         const parametro = await Parametro.find();
         // Calculamos el precio del cultivo
+        console.log(parametro);
+        console.log(cultivo);
 
-        cultivo.precio = parametro[0].valor_agua * cultivo.cantidad_agua +
-            parametro[0].valor_fertilizante * cultivo.cantidad_fertilizante +
-            parametro[0].valor_semilla * cultivo.cantidad_semilla;
+        cultivo.precio = parametro[0].valor_agua * cultivo.cantidad_agua_semana +
+            parametro[0].valor_fertilizante * cultivo.cantidad_fertilizante_semana +
+            parametro[0].valor_semilla * cultivo.cantidad_semillas_hectarea;
 
         // Se guarda el cultivo
         await cultivo.save();
@@ -30,9 +32,7 @@ router.post('/new', authGuard, async (request, response) => {
 router.get('/all', authGuard, async (request, response) => {
     const page = parseInt(request.query.page);
     const limit = parseInt(request.query.limit);
-    const tokenUser = request.headers['authorization'];
-    // const data = desencriptarToken(tokenUser)
-
+    
     try {
         console.log("Obteniendo todos los cultivos...");
         const cultivos = await Cultivo.find({}, null, {

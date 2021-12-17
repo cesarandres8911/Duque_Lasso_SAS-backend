@@ -34,7 +34,14 @@ const PredioSchema = new Schema({
         type: Number,
         default: 0
     },
-
+    asignado: {
+        type: Boolean,
+        default: false
+    },
+    usuario_asignado: {
+        type: Schema.Types.ObjectId,
+        ref: 'Usuario'
+    }
 },
     {
         timestamps: true

@@ -4,6 +4,7 @@ exports.authGuard = (request, response, next) => {
     console.log("Entrando a middleware auth...");
 
     const authorization = request.headers.authorization;
+    
     if (!authorization) {
         console.log('No hay encabezado de authorization')
         response.status(401).send({message:'Usted no tiene permisos para acceder a esta acción.'});
@@ -14,9 +15,17 @@ exports.authGuard = (request, response, next) => {
             request.jwtData = tokenData;
             return next();
         }catch (e) {
-            console.log('Error en middleware de autenticación: ');
-            console.log(e);
-            response.status(401).send({message:'Usted no tiene permisos para acceder a esta acción.'});
+            if (e.name) {
+                if (e.name == "TokenExpiredError") {
+                    console.log("El token ha expirado.");
+                    response.status(401).send({message:'Su session ha expirado. Por favor vuelva a iniciar sesión.', error: e.name});
+                }else {
+                    console.log("Error al verificar el token.");
+                    response.status(401).send({message:'Usted no tiene permisos para acceder a esta acción.'});
+                }
+
+            }
+
         }
 
     }

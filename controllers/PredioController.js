@@ -3,7 +3,6 @@ const { authGuard } = require('../middlewares/auth');
 const router = express.Router();
 const { Predio } = require('../models/Predio');
 const { Usuario } = require('../models/Usuario');
-const { AsignarPredio } = require('../models/AsignarPredio');
 
 // Crear predio nuevo
 router.post('/new', authGuard, async (request, response) => {
@@ -113,22 +112,101 @@ router.delete('/delete/:id', authGuard, async (request, response) => {
     }
 });
 
-// Obtener todos los predios asignados
+// Asignar predio a usuario por id y marcar como asignado
+router.put('/asignar/:id', authGuard, async (request, response) => {
+    try {
+        console.log("Asignando predio a usuario...");
+        const { id } = request.params;
+        const { usuario } = request.body;
+        const predio = await Predio.findById(id);
+        const usuario_asignado = await Usuario.findById(usuario);
+        predio.usuario_asignado = usuario_asignado;
+        predio.asignado = true;
+        await predio.save();
+        response.json({ message: 'Predio asignado con exito.', id: predio.id });
+    } catch (e) {
+        console.log("Error asignando predio a usuario: ");
+        console.log(e);
+        response.status(500).send({ message: "Error al asignar predio a usuario." });
+    }
+});
+
+// obtener todos los predios asignados a un usuario
+router.get('/asignados/:id', authGuard, async (request, response) => {
+    try {
+        console.log("Obteniendo todos los predios asignados a un usuario...");
+        const { id } = request.params;
+        const predios = await Predio.find({ usuario_asignado: id });
+        response.json({ predios: predios });
+    } catch (e) {
+        console.log("Error obteniendo todos los predios asignados a un usuario: ");
+        console.log(e);
+        response.status(500).send({ message: "Error al obtener todos los predios asignados a un usuario." });
+    }
+});
+
+// obtener todos los predios asignados y aplicar populate al usuario
 router.get('/all/asignados', authGuard, async (request, response) => {
+    const page = parseInt(request.query.page) || 0;
+    const limit = parseInt(request.query.limit) || 10;
     try {
         console.log("Obteniendo todos los predios asignados...");
-        const predios = await AsignarPredio.find({}, null, {
-            skip: 0,
-            limit: 100
+        const predio = await Predio.find({ asignado: true }, null, {
+            skip: ((page - 1) * limit),
+            limit: limit
+            }).populate('usuario_asignado');
+
+        const predios_usuario = predio.map(predio => {
+            predio.usuario_asignado.contrasena = undefined;
+            return predio;
         });
-        const total = await AsignarPredio.countDocuments();
-        response.json({ predios: predios, totalElements: total });
+                
+        const total = await Predio.countDocuments({ asignado: true });
+        response.json({ predios: predios_usuario, totalElements: total });
     } catch (e) {
         console.log("Error obteniendo todos los predios asignados: ");
         console.log(e);
         response.status(500).send({ message: "Error al obtener todos los predios asignados." });
     }
 });
+
+
+// obtener todos los predios no asignados
+router.get('/all/noasignados', authGuard, async (request, response) => {
+    const page = parseInt(request.query.page) || 0;
+    const limit = parseInt(request.query.limit) || 10;
+    
+    try {
+        console.log("Obteniendo todos los predios no asignados...");
+        const predios = await Predio.find({ asignado: false }, null, { 
+            skip: ((page - 1) * limit), 
+            limit: limit });
+        const total = await Predio.countDocuments({ asignado: false });
+        response.json({ predios: predios, totalElements: total });
+    } catch (e) {
+        console.log("Error obteniendo todos los predios no asignados: ");
+        console.log(e);
+        response.status(500).send({ message: "Error al obtener todos los predios no asignados." });
+    }
+});
+
+// Eliminar un usuario asignado a un predio y marcar como no asignado
+router.put('/desasignar/:id', authGuard, async (request, response) => {
+    try {
+        console.log("Desasignando predio a usuario...");
+        const { id } = request.params;
+        const predio = await Predio.findById(id);
+        predio.usuario_asignado = undefined;
+        predio.asignado = false;
+        await predio.save();
+        response.json({ message: 'Predio desasignado con exito.', id: predio.id });
+    } catch (e) {
+        console.log("Error desasignando predio a usuario: ");
+        console.log(e);
+        response.status(500).send({ message: "Error al desasignar predio a usuario." });
+    }
+});
+
 
 
 module.exports = router;
