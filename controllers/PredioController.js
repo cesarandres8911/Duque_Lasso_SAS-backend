@@ -3,12 +3,15 @@ const { authGuard } = require('../middlewares/auth');
 const router = express.Router();
 const { Predio } = require('../models/Predio');
 const { Usuario } = require('../models/Usuario');
+const { Cultivo } = require('../models/Cultivo');
 
 // Crear predio nuevo
 router.post('/new', authGuard, async (request, response) => {
     try {
         console.log("Creando predio nuevo...");
         const predio = new Predio(request.body);
+        // Se asigna el area disponible del predio igual al area del predio
+        predio.areaDisponible = predio.area;
         await predio.save();
         response.json({ message: 'Predio guardado con exito.', id: predio.id });
     } catch (e) {
@@ -32,7 +35,7 @@ router.get('/all', authGuard, async (request, response) => {
 
         const total = await Predio.countDocuments();
         response.json({ totalElements: total, predios: predios });
-        
+
     } catch (e) {
         console.log("Error obteniendo todos los predios: ");
         console.log(e);
@@ -61,7 +64,7 @@ router.get('/:id', authGuard, async (request, response) => {
     try {
         console.log("Obteniendo predio por id...");
         const predio = await Predio.findById(request.query.id);
-        response.json({predios: predio});
+        response.json({ predios: predio });
     } catch (e) {
         console.log("Error obteniendo predio por id: ");
         console.log(e);
@@ -70,13 +73,13 @@ router.get('/:id', authGuard, async (request, response) => {
 });
 
 // Obterner predio por id
-router.get('/:id/asignar', authGuard, async (request, response) => {
+router.get('/:id/asignado', authGuard, async (request, response) => {
     try {
         console.log("Obteniendo predio por id...");
         const { id } = request.params;
         console.log(id);
         const predio = await Predio.findById(id);
-        response.json({predios: predio});
+        response.json({ predios: predio });
     } catch (e) {
         console.log("Error obteniendo predio por id: ");
         console.log(e);
@@ -154,13 +157,13 @@ router.get('/all/asignados', authGuard, async (request, response) => {
         const predio = await Predio.find({ asignado: true }, null, {
             skip: ((page - 1) * limit),
             limit: limit
-            }).populate('usuario_asignado');
+        }).populate('usuario_asignado');
 
         const predios_usuario = predio.map(predio => {
             predio.usuario_asignado.contrasena = undefined;
             return predio;
         });
-                
+
         const total = await Predio.countDocuments({ asignado: true });
         response.json({ predios: predios_usuario, totalElements: total });
     } catch (e) {
@@ -175,12 +178,13 @@ router.get('/all/asignados', authGuard, async (request, response) => {
 router.get('/all/noasignados', authGuard, async (request, response) => {
     const page = parseInt(request.query.page) || 0;
     const limit = parseInt(request.query.limit) || 10;
-    
+
     try {
         console.log("Obteniendo todos los predios no asignados...");
-        const predios = await Predio.find({ asignado: false }, null, { 
-            skip: ((page - 1) * limit), 
-            limit: limit });
+        const predios = await Predio.find({ asignado: false }, null, {
+            skip: ((page - 1) * limit),
+            limit: limit
+        });
         const total = await Predio.countDocuments({ asignado: false });
         response.json({ predios: predios, totalElements: total });
     } catch (e) {
@@ -204,6 +208,81 @@ router.put('/desasignar/:id', authGuard, async (request, response) => {
         console.log("Error desasignando predio a usuario: ");
         console.log(e);
         response.status(500).send({ message: "Error al desasignar predio a usuario." });
+    }
+});
+
+// predios/${predio}/cultivos/${cultivo}/recolectar
+// Asignar un cultivo a un predio
+router.put('/:id_predio/cultivos/:id_cultivo/recolectar', authGuard, async (request, response) => {
+    try {
+        console.log("Asignando cultivo a predio...");
+        const { id_predio } = request.params;
+        const { id_cultivo } = request.params;
+        const { area_destinada, fecha_siembra, fecha_recoleccion } = request.body;
+        console.log(id_predio);
+        console.log(id_cultivo);
+        console.log(area_destinada);
+        console.log(fecha_siembra);
+        console.log(fecha_recoleccion);
+
+        const predio = await Predio.findById(id_predio);
+        const cultivo = await Cultivo.findById(id_cultivo);
+        predio.areaAsignada = area_destinada;
+        cultivo.fecha_siembra = fecha_siembra;
+        cultivo.fecha_recoleccion = fecha_recoleccion;
+        if (predio.areaDisponible >= area_destinada) {
+            predio.areaDisponible = predio.areaDisponible - area_destinada;
+            predio.cultivos.push(cultivo);
+            await predio.save();
+            response.json({ message: 'Cultivo asignado con exito.', id: predio.id });
+        } throw { message: "No hay suficiente area disponible para asignar el cultivo.",error:"error" };
+
+
+    } catch (e) {
+        if (e.error === "error") {
+            response.json({ message: e.message });
+            
+        } else {
+            console.log("Error asignando cultivo a predio: ");
+            response.status(500).send({ message: "Error al asignar cultivo a predio." });
+        }
+    }
+});
+
+// Obtener todos los cultivos asignados a un predio
+router.get('/:id_predio/cultivos', authGuard, async (request, response) => {
+    try {
+        console.log("Obteniendo todos los cultivos asignados a un predio...");
+        const { id_predio } = request.params;
+        const predio = await Predio.findById(id_predio);
+        response.json({ cultivos: predio.cultivos });
+    } catch (e) {
+        console.log("Error obteniendo todos los cultivos asignados a un predio: ");
+        console.log(e);
+        response.status(500).send({ message: "Error al obtener todos los cultivos asignados a un predio." });
+    }
+});
+
+// Obtener todos los cultivos asignados a los predios de un usuario
+router.get('/cultivos/asignados/:id_usuario', authGuard, async (request, response) => {
+    try {
+        console.log("Obteniendo todos los cultivos asignados a los predios de un usuario...");
+        const { id_usuario } = request.params;
+        
+        const predios = await Predio.find({ usuario_asignado: id_usuario, 'cultivos.1': { $exists: true } });
+        const cultivos = [];
+        for (let i = 0; i < predios.length; i++) {
+            for (let j = 0; j < predios[i].cultivos.length; j++) {
+                cultivos.push(await Cultivo.findById(predios[i].cultivos[j]));
+                // cultivos.push(predios[i].cultivos[j]);
+            }
+        }
+        
+        response.json({ cultivos:cultivos, predios:predios });
+    } catch (e) {
+        console.log("Error obteniendo todos los cultivos asignados a los predios de un usuario: ");
+        console.log(e);
+        response.status(500).send({ message: "Error al obtener todos los cultivos asignados a los predios de un usuario." });
     }
 });
 

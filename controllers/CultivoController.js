@@ -3,6 +3,7 @@ const { authGuard } = require('../middlewares/auth');
 const router = express.Router();
 const { Cultivo } = require('../models/Cultivo');
 const { Parametro } = require('../models/Parametro');
+const { Predio } = require('../models/Predio');
 
 // Crear cultivo nuevo
 router.post('/new', authGuard, async (request, response) => {
@@ -67,9 +68,10 @@ router.get('/all/autocomplete', authGuard, async (request, response) => {
 
 // Obtener cultivo por id
 router.get('/:id', authGuard, async (request, response) => {
+    console.log(request.params.id);
     try {
         console.log("Obteniendo cultivo por id...");
-        const cultivo = await Cultivo.findById(request.query.id);
+        const cultivo = await Cultivo.findById(request.params.id);
 
         const parametro = await Parametro.find();
         // Calculamos el precio del cultivo
@@ -123,5 +125,7 @@ router.delete('/delete/:id', authGuard, async (request, response) => {
         response.status(500).send({ message: "Error al eliminar cultivo." });
     }
 });
+
+  
 
 module.exports = router;

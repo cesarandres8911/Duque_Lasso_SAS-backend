@@ -54,6 +54,14 @@ const CultivoSchema = new Schema({
     predio: {
         type: Schema.Types.ObjectId,
         ref: 'Predio'
+    },
+    fecha_siembra: {
+        type: Date,
+        required: false
+    },
+    fecha_recoleccion: {
+        type: Date,
+        required: false
     }
 
 },

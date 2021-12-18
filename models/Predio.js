@@ -38,10 +38,24 @@ const PredioSchema = new Schema({
         type: Boolean,
         default: false
     },
+    areaAsignada: {
+        type: Number,
+        default: 0
+    },
+    // area disponible para cultivo por defecto se coloca la misma area del predio
+
+    areaDisponible: {
+        type: Number,
+        default: 0
+    },
     usuario_asignado: {
         type: Schema.Types.ObjectId,
         ref: 'Usuario'
-    }
+    },
+    cultivos: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Cultivo'
+    }]
 },
     {
         timestamps: true
