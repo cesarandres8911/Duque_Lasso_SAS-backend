@@ -56,11 +56,11 @@ const CultivoSchema = new Schema({
         ref: 'Predio'
     },
     fecha_siembra: {
-        type: Date,
+        type: String,
         required: false
     },
     fecha_recoleccion: {
-        type: Date,
+        type: String,
         required: false
     }
 
