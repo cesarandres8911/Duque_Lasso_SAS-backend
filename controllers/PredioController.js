@@ -64,7 +64,7 @@ router.get('/all/autocomplete', authGuard, async (request, response) => {
 router.get('/:id', authGuard, async (request, response) => {
     try {
         console.log("Obteniendo predio por id...");
-        const predio = await Predio.findById(request.query.id);
+        const predio = await Predio.findById(request.params.id);
         response.json({ predios: predio });
     } catch (e) {
         console.log("Error obteniendo predio por id: ");
@@ -93,7 +93,11 @@ router.put('/edit/:id', authGuard, async (request, response) => {
     try {
         console.log("Editando predio...");
         const { id } = request.params;
+        const datos = request.body;
+        datos.areaDisponible = datos.area-datos.areaAsignada;
+        console.log(datos)
         const predio = await Predio.findByIdAndUpdate(id, request.body);
+        
         response.json({ message: 'Predio editado con exito.', id: predio.id });
     } catch (e) {
         console.log("Error editando predio: ");
@@ -220,12 +224,6 @@ router.put('/:id_predio/cultivos/:id_cultivo/recolectar', authGuard, async (requ
         const { id_predio } = request.params;
         const { id_cultivo } = request.params;
         const { area_destinada, fecha_siembra, fecha_recoleccion } = request.body;
-        console.log(id_predio);
-        console.log(id_cultivo);
-        console.log(area_destinada);
-        console.log(fecha_siembra);
-        console.log(fecha_recoleccion);
-
         const predio = await Predio.findById(id_predio);
         if (predio.cultivos.includes(id_cultivo)) throw {
             message: "El cultivo ya se encuentra asignado al predio.", error: "error"
@@ -264,6 +262,35 @@ router.put('/:id_predio/cultivos/:id_cultivo/recolectar', authGuard, async (requ
         } else {
             console.log("Error asignando cultivo a predio: ");
             response.status(500).send({ message: "Error al asignar cultivo a predio." });
+        }
+        console.log(e);
+    }
+});
+
+// Desasignar un cultivo de un predio
+router.delete('/:id_predio/cultivos/:id_cultivo/desasignar', authGuard, async (request, response) => {
+    try {
+        console.log("Desasignando cultivo de predio...");
+        const { id_predio } = request.params;
+        const { id_cultivo } = request.params;
+        const predio = await Predio.findById(id_predio);
+        const cultivo = await Cultivo.findById(id_cultivo);
+        const index = predio.cultivos.indexOf(id_cultivo);
+        if (index > -1) {
+            predio.cultivos.splice(index, 1);
+            predio.areaDisponible = predio.areaDisponible + cultivo.area_destinada;
+            await predio.save();
+            await cultivo.save();
+            response.json({ message: 'Cultivo desasignado con exito.' });
+        } else {
+            response.json({ message: "El cultivo no se encuentra asignado al predio.", error: "error" });
+        }
+    } catch (e) {
+        if (e.error === "error") {
+            response.json({ message: e.message });
+        } else {
+            console.log("Error desasignando cultivo de predio: ");
+            response.status(500).send({ message: "Error al desasignar cultivo de predio." });
         }
         console.log(e);
     }
