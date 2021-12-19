@@ -6,6 +6,7 @@ const { Parametro } = require('../models/Parametro');
 // Obtener los parametros
 router.get('/', authGuard, async (request, response) => {
     try {
+        console.log("Obteniendo parametros...");
         const parametro = await Parametro.find();
         response.json({parametros:parametro});
     } catch (e) {
@@ -33,6 +34,7 @@ router.post('/new', authGuard, async (request, response) => {
 // Obtener parametro por id
 router.get('/:id', authGuard, async (request, response) => {
     try {
+        console.log("Obteniendo parametro por id...");
         const parametro = await Parametro.findById(request.params.id);
         response.json(parametro);
     } catch (e) {
@@ -45,6 +47,7 @@ router.get('/:id', authGuard, async (request, response) => {
 // Editar parametro por id
 router.put('/edit/:id', authGuard, async (request, response) => {
     try {
+        console.log("Editando parametro por id...");
         const { id } = request.params;
         const parametro = await Parametro.findByIdAndUpdate(id, request.body);
         response.json({ message: 'Parametro editado con exito.', id: parametro.id });
