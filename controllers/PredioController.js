@@ -4,6 +4,7 @@ const router = express.Router();
 const { Predio } = require('../models/Predio');
 const { Usuario } = require('../models/Usuario');
 const { Cultivo } = require('../models/Cultivo');
+const { desencriptarToken } = require('../utils/authUtils');
 const { model } = require('mongoose');
 
 // Crear predio nuevo
@@ -24,8 +25,8 @@ router.post('/new', authGuard, async (request, response) => {
 
 // Obtener todos los predios limitados por pagina
 router.get('/all', authGuard, async (request, response) => {
-    const page = parseInt(request.query.page);
-    const limit = parseInt(request.query.limit);
+    const page = parseInt(request.query.page)||1;
+    const limit = parseInt(request.query.limit)||10;
 
     try {
         console.log("Obteniendo todos los predios...");
@@ -94,10 +95,10 @@ router.put('/edit/:id', authGuard, async (request, response) => {
         console.log("Editando predio...");
         const { id } = request.params;
         const datos = request.body;
-        datos.areaDisponible = datos.area-datos.areaAsignada;
+        datos.areaDisponible = datos.area - datos.areaAsignada;
         console.log(datos)
         const predio = await Predio.findByIdAndUpdate(id, request.body);
-        
+
         response.json({ message: 'Predio editado con exito.', id: predio.id });
     } catch (e) {
         console.log("Error editando predio: ");
@@ -279,6 +280,7 @@ router.delete('/:id_predio/cultivos/:id_cultivo/desasignar', authGuard, async (r
         if (index > -1) {
             predio.cultivos.splice(index, 1);
             predio.areaDisponible = predio.areaDisponible + cultivo.area_destinada;
+            predio.areaAsignada = predio.areaAsignada - cultivo.area_destinada;
             await predio.save();
             await cultivo.save();
             response.json({ message: 'Cultivo desasignado con exito.' });
@@ -314,18 +316,34 @@ router.get('/:id_predio/cultivos', authGuard, async (request, response) => {
 router.get('/cultivos/asignados/:id_usuario', authGuard, async (request, response) => {
     const page = parseInt(request.params.page) || 1;
     const limit = parseInt(request.params.limit) || 5;
+    const tokenUser = request.headers['authorization'];
+
     try {
-        console.log("Obteniendo todos los cultivos asignados a los predios de un usuario...");
-        const { id_usuario } = request.params;
+        const data = desencriptarToken(tokenUser);
+        
+        if (data.user.rol !== "Admin") {
+            console.log("Obteniendo todos los cultivos asignados a los predios de un usuario...");
+            const { id_usuario } = request.params;
 
-        const predios = await Predio.find({ usuario_asignado: id_usuario, 'cultivos.0': { $exists: true } }, null, {
-            skip: ((page - 1) * limit),
-            limit: limit
-        });
+            const predios = await Predio.find({ usuario_asignado: id_usuario, 'cultivos.0': { $exists: true } }, null, {
+                skip: ((page - 1) * limit),
+                limit: limit
+            });
 
-        const totalpredios = await Predio.countDocuments({ usuario_asignado: id_usuario, 'cultivos.0': { $exists: true } });
+            const totalpredios = await Predio.countDocuments({ usuario_asignado: id_usuario, 'cultivos.0': { $exists: true } });
 
-        response.json({ predios: predios, totalElements: totalpredios });
+            response.json({ predios: predios, totalElements: totalpredios });
+        } else {
+            console.log("Obteniendo todos los cultivos asignados a los predios rol Admin...");
+            const predios = await Predio.find({ 'cultivos.0': { $exists: true } }, null, {
+                skip: ((page - 1) * limit),
+                limit: limit
+            });
+
+            const totalpredios = await Predio.countDocuments({ 'cultivos.0': { $exists: true } });
+
+            response.json({ predios: predios, totalElements: totalpredios });
+        }
 
     } catch (e) {
         console.log("Error obteniendo todos los cultivos asignados a los predios de un usuario: ");

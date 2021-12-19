@@ -31,8 +31,8 @@ router.post('/new', authGuard, async (request, response) => {
 
 // Obtener todos los cultivos
 router.get('/all', authGuard, async (request, response) => {
-    const page = parseInt(request.query.page);
-    const limit = parseInt(request.query.limit);
+    const page = parseInt(request.query.page)||1;
+    const limit = parseInt(request.query.limit)||10;
     
     try {
         console.log("Obteniendo todos los cultivos...");

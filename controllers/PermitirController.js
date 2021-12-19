@@ -9,19 +9,25 @@ router.post('/', authGuard, async (request, response) => {
     const datos = request.body;
     // const data = desencriptarToken(datos.token);
     // console.log(pagina);
-    console.log(tokenUser);
-    console.log(datos);
+    // console.log(tokenUser);
+    console.log(datos.pagina);
 
     try {
         const data = desencriptarToken(tokenUser);
-        console.log(data);
+        console.log(data.user.rol);
         console.log("Obteniendo permisos...");
         if ((data.user.rol === "Admin" || data.user.rol === "userConfig") && datos.pagina === "configuracion") {
+            console.log('Permisos obtenidos con exito.');
             response.json({ message: 'Permisos obtenidos con exito.', permitir: true, status: 200 });
-        } if ((data.user.rol === "userConfig" || datos.user.rol === "userGestion") && datos.pagina === "usuarios") {
+        }else if ((data.user.rol === "userConfig" || data.user.rol === "userGestion") && datos.pagina === "usuarios") {
+            console.log('No tiene permisos para acceder a este recurso.');
             response.json({ message: 'No tiene permisos para acceder a este recurso.', permitir: false, status: 401 });
-        } if (data.user.rol === "userConfig" && datos.pagina === "gestion") {
+        }else if (data.user.rol === "userConfig" && datos.pagina === "gestion") {
+            console.log('No tiene permisos para acceder a este recurso.');
             response.json({ message: 'No tiene permisos para acceder a este recurso.', permitir: false, status: 401 });
+        }else{
+            console.log('No tiene permisos para acceder a este recurso.');
+            response.status(401).json({ message: 'No tiene permisos para acceder a este recurso.', permitir: false, status: 401 });
         }
 
     } catch (e) {
