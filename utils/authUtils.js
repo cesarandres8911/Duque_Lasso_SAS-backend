@@ -54,6 +54,34 @@ const desencriptarToken = (token) => {
 
 }
 
+// Token para recuperar contraseña
+const getTokenRecovery = async (user) => {
+  const recoveryToken = await sign(
+    {
+      user: { _id: user._id, rol: user.rol, user: user.email },
+    },
+    process.env.JWT_RECOVERY_SECRET,
+    // expira en 1 hora
+    { expiresIn: '1h' }
+  );
+
+  return recoveryToken;
+};
+// Verificar que el token sea valido
+const verificarToken = async (token) => {
+  try {
+    const tokenSplit = token;
+    const decoded = verify(tokenSplit, process.env.JWT_RECOVERY_SECRET);
+    return decoded;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+
+};
+
 exports.validarUsuario = validarUsuario;
 exports.getTokenPair = getTokenPair;
 exports.desencriptarToken = desencriptarToken;
+exports.getTokenRecovery = getTokenRecovery;
+exports.verificarToken = verificarToken;

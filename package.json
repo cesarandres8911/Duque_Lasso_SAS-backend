@@ -23,7 +23,8 @@
   "homepage": "https://github.com/cesarandres8911/Duque_Lasso_SAS-backend#readme",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "nodemailer": "^6.7.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.16.0",

@@ -92,6 +92,7 @@ router.get('/:id/asignado', authGuard, async (request, response) => {
 // Editar predio por id
 router.put('/edit/:id', authGuard, async (request, response) => {
     try {
+        // console.log(request.files);
         console.log("Editando predio...");
         const { id } = request.params;
         const datos = request.body;

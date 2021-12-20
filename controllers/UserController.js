@@ -1,7 +1,9 @@
 const express = require('express');
 const { Usuario } = require('../models/Usuario');
-const { validarUsuario, desencriptarToken } = require('../utils/authUtils');
+const { validarUsuario, desencriptarToken, getTokenRecovery, verificarToken } = require('../utils/authUtils');
 const { authGuard } = require('../middlewares/auth');
+const nodemailer = require('nodemailer')
+
 
 const router = express.Router();
 
@@ -176,6 +178,102 @@ router.delete('/delete/:id', authGuard, async (request, response) => {
         response.status(500).send({ message: "Error al eliminar usuario." });
     }
 });
+
+// validar si un correo existe en la base de datos para recuperar contraseña
+router.post('/validarCorreo', async (request, response) => {
+    try {
+        console.log("Validando correo...");
+        const { email } = request.body;
+        console.log(email);
+        const usr = await Usuario.findOne({ email: email });
+        if (usr) {
+            // Generar token de recuperacion
+            const token = await getTokenRecovery(usr);
+            console.log(token);
+            // Enviar correo con token
+            console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+            const transporter = nodemailer.createTransport({
+                service: 'Gmail',
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS
+                }
+            });
+            const mailOptions = {
+                from: '"Recuperar contraseña" <' + process.env.EMAIL_USER + '>',
+                to: email,
+                subject: 'Recuperar contraseña en Duque Lasso SAS',
+                text: 'Hola, para recuperar tu contraseña ingresa al siguiente link: ' + process.env.URL_FRONT + '/users/recuperar/' + token,
+                html: '<p>Hola, para recuperar tu contraseña ingresa al siguiente link: <a href="' + process.env.URL_FRONT + '/users/recuperar/' + token + '">Recuperar contraseña</a></p>'
+            };
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    console.log(error);
+                    response.status(500).send({ message: "Error al enviar correo." });
+                } else {
+                    console.log('Email sent: ' + info.response);
+                    response.json({ message: 'Correo enviado con exito.' });
+                }
+            });
+        } else {
+            response.status(500).send({ message: "El correo no existe." });
+        }
+    } catch (e) {
+        console.log("Error al validar correo.");
+        console.log(e);
+        response.status(500).send({ message: "Error al validar correo." });
+    }
+});
+
+// Validar el token de recuperacion
+router.get('/validar/:token', async (request, response) => {
+    try {
+        console.log("Validando token...");
+        const { token } = request.params;
+        console.log(token);
+        const user = await verificarToken(token);
+        if (user) {
+            response.json({ message: 'Token validado con exito.' });
+        }else{
+            response.status(500).send({ message: "Token invalido." });
+        }
+      
+    } catch (e) {
+        console.log("Error al validar token.");
+        console.log(e);
+        response.status(500).send({ message: "Error al validar token." });
+    }
+});
+
+
+// Recuperar contraseña desde el enlace enviado por correo
+router.post('/recuperar/:token', async (request, response) => {
+    try {
+        console.log("Recuperando contraseña...");
+        const { token } = request.params;
+        const decoded = await verificarToken(token);
+        console.log(decoded.user);
+        const usr = await Usuario.findById(decoded.user._id);
+        const {newPassword, confirmarPassword} = request.body;
+
+        if (newPassword === confirmarPassword) {
+            // const password = await usr.cambiarPassword(newPassword);
+            // console.log(password);
+            usr.contrasena = newPassword;
+            await usr.save();
+            response.json({ message: 'Contraseña recuperada con exito.' });
+        } else {
+            response.status(500).send({ message: "Las contraseñas no coinciden." });
+        }
+        
+    } catch (e) {
+        console.log("Error al recuperar contraseña.");
+        console.log(e);
+        response.status(500).send({ message: "Error al recuperar contraseña." });
+    }
+});
+
+
 
 
 module.exports = router;
