@@ -5,7 +5,9 @@ const { Predio } = require('../models/Predio');
 const { Usuario } = require('../models/Usuario');
 const { Cultivo } = require('../models/Cultivo');
 const { desencriptarToken } = require('../utils/authUtils');
+const fs = require('fs');
 const { model } = require('mongoose');
+
 
 // Crear predio nuevo
 router.post('/new', authGuard, async (request, response) => {
@@ -92,13 +94,11 @@ router.get('/:id/asignado', authGuard, async (request, response) => {
 // Editar predio por id
 router.put('/edit/:id', authGuard, async (request, response) => {
     try {
-        // console.log(request.files);
         console.log("Editando predio...");
         const { id } = request.params;
         const datos = request.body;
-        datos.areaDisponible = datos.area - datos.areaAsignada;
-        console.log(datos)
-        const predio = await Predio.findByIdAndUpdate(id, request.body);
+        // datos.areaDisponible = datos.area - datos.areaAsignada;
+        const predio = await Predio.findByIdAndUpdate(id, datos);
 
         response.json({ message: 'Predio editado con exito.', id: predio.id });
     } catch (e) {

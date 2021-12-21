@@ -23,6 +23,7 @@ const getTokenPair = async (user) => {
     email: user.email,
     telefono: user.telefono,
     rol: user.rol,
+    imagen: user.imagen
 
   }
 

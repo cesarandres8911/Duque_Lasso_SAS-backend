@@ -20,6 +20,10 @@ const usuarioSchema = new Schema({
         validate: [validator.isEmail, 'El email del usuario no es válido.'],
         
     },
+    imagen: {
+        type: String,
+        default: 'https://lh3.googleusercontent.com/ZcIqijLggCXPrn6oeFdFuVMN3Gs2TsEcEEGss-cenT5OBEgfalj1XiYJvNzRzakn7EFUvup39zpq65Pj9J0vu-83Rby1_iPIwC4vbL0ILBWlv2P6x81ZN7Aqr_R1fwa-4JqPWWY_1FpWfIClbtWWPTcswEksCSQEjDU7lC69JfMsovY6N9FbZyhdYW6-l5ohPFr6bnmFa5lXOLp4j-kt6cO1sn-dwBmq2xuIfEHciawpHAV7QCKYOAOUu6WoxmfWZSOLT1co3cpVcRwcgWIHsKRMl6OZjeBLbCwmmPgv08PZ6v3a0QNiMd4eXqfzuNaLfnwyr-flA-pDjGxoEJJe719KEtFAAnf_V4xCQwOBpGtUlqtcoaFcLqM0MXjVu1EyyrKCTZc_h38eAcGwfXLSMHV_nSV3MjCBL3u6BUGMhFMGl95_crM-UzDtkL4p_zIq6ojkB4MmwVGwYzqw2fjUT2R4PN4Rj1OMmlJ1K8b4umfcdkrLxPiJRdUvnIvyy_hSFOMPYDm84eMe8zhWug0HKd8g13nR9X7ISlqFt2SdO7vhPMpGN_tlLRwpj-R58K2TBo4eACcinq6yooE7e5mGnypAKCjClWH2pYx54eAv3tO_aFJ5RxLX4PrIP_wxaE52DDiwcGYs452dB_vkXpCiS2tqviEgGWifMYREWgHZOMv1xdhdlm5SXe-P_J5nCbb7JFQaexHRq9uW1NEMSHpaYhPIpJyfIJGm_ExwNxAqp9ro7no_Slz6oCBB2CW0rScdOM14aelYWVFlzLCO=s72-no'
+    },
     contrasena: {
         type: String,
         required: [true, 'La contraseña es obligatoria']
