@@ -12,8 +12,7 @@ router.post('/new', authGuard, async (request, response) => {
         const cultivo = new Cultivo(request.body);
         const parametro = await Parametro.find();
         // Calculamos el precio del cultivo
-        console.log(parametro);
-        console.log(cultivo);
+
 
         cultivo.precio = parametro[0].valor_agua * cultivo.cantidad_agua_semana +
             parametro[0].valor_fertilizante * cultivo.cantidad_fertilizante_semana +
@@ -95,7 +94,7 @@ router.put('/edit/:id', authGuard, async (request, response) => {
         console.log("Editando cultivo...");
         const { id } = request.params;
         const datos = request.body;
-        console.log(datos);
+        
         const parametro = await Parametro.find();
         // Calculamos el precio del cultivo
 

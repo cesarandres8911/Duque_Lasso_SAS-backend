@@ -10,11 +10,11 @@ router.post('/', authGuard, async (request, response) => {
     // const data = desencriptarToken(datos.token);
     // console.log(pagina);
     // console.log(tokenUser);
-    console.log(datos.pagina);
+    // console.log(datos.pagina);
 
     try {
         const data = desencriptarToken(tokenUser);
-        console.log(data.user.rol);
+        
         console.log("Obteniendo permisos...");
         if ((data.user.rol === "Admin" || data.user.rol === "userConfig") && datos.pagina === "configuracion") {
             console.log('Permisos obtenidos con exito.');
@@ -43,8 +43,8 @@ router.post('/edit', authGuard, async (request, response) => {
     const datos = request.body;
     // const data = desencriptarToken(datos.token);
     // console.log(pagina);
-    console.log(tokenUser);
-    console.log(datos);
+    // console.log(tokenUser);
+    // console.log(datos);
     response.json({ message: 'Permisos obtenidos con exito.', permitir: true, status: 200 });
 });
 

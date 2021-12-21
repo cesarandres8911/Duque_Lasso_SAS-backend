@@ -24,7 +24,7 @@ router.post('/new', authGuard, async (request, response) => {
 //{ username: xxxxxx, password: xxxxxxx }
 router.post('/login', async (request, response) => {
     try {
-        console.log(request.body);
+        // console.log(request.body);
         const { refreshToken, accessToken, datosUser } = await validarUsuario(request.body);
         response.status(200).json({ token: accessToken, datosUser: datosUser });
 
@@ -39,7 +39,7 @@ router.post('/login', async (request, response) => {
 router.post('/cambiarPass', authGuard, async (request, response) => {
     try {
         console.log("Cambiando contraseña...");
-        console.log(request.body);
+        // console.log(request.body);
         const { refreshToken, accessToken, datosUser } = await validarUsuario(request.body);
         const usr = await Usuario.findOne({ email: datosUser.email });
         // usr.password = request.body.newPassword;
@@ -140,7 +140,7 @@ router.get('/:id', authGuard, async (request, response) => {
     try {
         console.log("Obteniendo predio por id...");
         const { id } = request.params;
-        console.log(id);
+        // console.log(id);
         const usuario = await Usuario.findById(id);
         response.json({usuarios: usuario});
     } catch (e) {
@@ -169,7 +169,7 @@ router.put('/edit/:id', authGuard, async (request, response) => {
 router.delete('/delete/:id', authGuard, async (request, response) => {
     try {
         console.log("Eliminando usuario...");
-        console.log(request.params.id);
+        // console.log(request.params.id);
         const usr = await Usuario.findByIdAndDelete(request.params.id);
         response.json({ message: 'Usuario eliminado con exito.' });
     } catch (e) {
@@ -184,14 +184,14 @@ router.post('/validarCorreo', async (request, response) => {
     try {
         console.log("Validando correo...");
         const { email } = request.body;
-        console.log(email);
+        // console.log(email);
         const usr = await Usuario.findOne({ email: email });
         if (usr) {
             // Generar token de recuperacion
             const token = await getTokenRecovery(usr);
-            console.log(token);
+            // console.log(token);
             // Enviar correo con token
-            console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+            // console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
             const transporter = nodemailer.createTransport({
                 service: 'Gmail',
                 auth: {
@@ -230,7 +230,7 @@ router.get('/validar/:token', async (request, response) => {
     try {
         console.log("Validando token...");
         const { token } = request.params;
-        console.log(token);
+        // console.log(token);
         const user = await verificarToken(token);
         if (user) {
             response.json({ message: 'Token validado con exito.' });
@@ -252,7 +252,7 @@ router.post('/recuperar/:token', async (request, response) => {
         console.log("Recuperando contraseña...");
         const { token } = request.params;
         const decoded = await verificarToken(token);
-        console.log(decoded.user);
+        // console.log(decoded.user);
         const usr = await Usuario.findById(decoded.user._id);
         const {newPassword, confirmarPassword} = request.body;
 

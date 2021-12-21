@@ -81,7 +81,7 @@ router.get('/:id/asignado', authGuard, async (request, response) => {
     try {
         console.log("Obteniendo predio por id...");
         const { id } = request.params;
-        console.log(id);
+        // console.log(id);
         const predio = await Predio.findById(id);
         response.json({ predios: predio });
     } catch (e) {
@@ -232,17 +232,17 @@ router.put('/:id_predio/cultivos/:id_cultivo/recolectar', authGuard, async (requ
         }
         const cultivo = await Cultivo.findById(id_cultivo);
         predio.areaAsignada = area_destinada;
-        console.log("area disponile: ", predio.areaDisponible);
-        console.log("area asignada: ", predio.areaAsignada);
+        // console.log("area disponile: ", predio.areaDisponible);
+        // console.log("area asignada: ", predio.areaAsignada);
         cultivo.fecha_siembra = fecha_siembra;
         cultivo.fecha_recoleccion = fecha_recoleccion;
 
         if (predio.areaDisponible >= area_destinada) {
             predio.areaDisponible = predio.areaDisponible - area_destinada;
-            console.log("area disponile: ", predio.areaDisponible);
-            console.log(predio.cultivos);
+            // console.log("area disponile: ", predio.areaDisponible);
+            // console.log(predio.cultivos);
             predio.cultivos.push(cultivo);
-            console.log(predio.cultivos);
+            // console.log(predio.cultivos);
             console.log("Guardando predio...");
             await predio.save();
             console.log("Guardando cultivo...");
